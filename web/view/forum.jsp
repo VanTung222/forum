@@ -961,7 +961,6 @@
                     </div>
                 </div>
                 <!-- Leaderboard -->
-                <!-- Leaderboard -->
                 <div class="widget" style="padding-top:18px;">
                     <div style="font-size:1.15em;font-weight:700;color:#232946;margin-bottom:18px;display:flex;align-items:center;gap:10px;">
                         <i class="fas fa-trophy" style="color:#f7c873;"></i> Leaderboard

@@ -61,6 +61,16 @@ public class ForumServlet extends HttpServlet {
             request.setAttribute("username", username);
             request.setAttribute("user", user);
 
+            // Set leaderboard data for both forum and post detail pages
+            int limit = 100;
+            String timeFrame = request.getParameter("sort") != null
+                    && Arrays.asList("weekly", "monthly", "alltime").contains(request.getParameter("sort"))
+                    ? request.getParameter("sort") : "alltime";
+            List<UserActivityScore> topUsers = scoreDAO.getTopUsers(limit, timeFrame);
+            request.setAttribute("topUsers", topUsers);
+            request.setAttribute("timeFrame", timeFrame);
+            LOGGER.info("Leaderboard set with timeFrame: " + timeFrame + ", topUsers size: " + (topUsers != null ? topUsers.size() : 0));
+
             if (pathInfo != null && pathInfo.matches("/\\d+")) {
                 int postId = Integer.parseInt(pathInfo.substring(1));
                 ForumPost post = postDAO.getPostById(postId);
@@ -75,6 +85,15 @@ public class ForumServlet extends HttpServlet {
                 List<ForumPost> relatedPosts = postDAO.getRelatedPosts(postId, post.getCategory(), 3);
                 request.setAttribute("relatedPosts", relatedPosts);
 
+                // Set sort and filter defaults for consistency
+                String sort = request.getParameter("sort") != null ? request.getParameter("sort") : "newest";
+                String filter = request.getParameter("filter") != null ? request.getParameter("filter") : "all";
+                String search = request.getParameter("search");
+                request.setAttribute("sort", sort);
+                request.setAttribute("filter", filter);
+                request.setAttribute("search", search);
+
+                LOGGER.info("Forwarding to /view/postDetail.jsp for postId: " + postId);
                 request.getRequestDispatcher("/view/postDetail.jsp").forward(request, response);
                 return;
             } else {
@@ -99,20 +118,6 @@ public class ForumServlet extends HttpServlet {
                 }
 
                 List<ForumPost> posts = postDAO.getPostsSortedAndFiltered(sort, filter, search, page, size);
-
-                // Handle leaderboard with 100 users
-                int limit = 100;
-                String timeFrame = "alltime"; // Default to alltime
-                if ("weekly".equals(sort)) {
-                    timeFrame = "weekly";
-                } else if ("monthly".equals(sort)) {
-                    timeFrame = "monthly";
-                } else if ("alltime".equals(sort)) {
-                    timeFrame = "alltime";
-                }
-                List<UserActivityScore> topUsers = scoreDAO.getTopUsers(limit, timeFrame);
-                request.setAttribute("topUsers", topUsers);
-                request.setAttribute("timeFrame", timeFrame); // Pass timeFrame to JSP
 
                 request.setAttribute("posts", posts);
                 request.setAttribute("sort", sort);
