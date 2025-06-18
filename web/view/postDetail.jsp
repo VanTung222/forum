@@ -644,11 +644,8 @@
                 color: var(--primary);
             }
             .btn-danger {
-                background: var(--danger);
-                color: #fff;
-            }
-            .btn-danger:hover {
                 background: #dc2626;
+                color: #fff;
             }
             .related-posts {
                 background: var(--card-bg);
@@ -910,11 +907,21 @@
         <!-- Main Container -->
         <div class="container">
             <div class="content-wrapper">
-                <!-- Left Sidebar: Author Info -->
+                <!-- Left Sidebar: Author Info & Related Posts -->
                 <%
                     ForumPost post = (ForumPost) request.getAttribute("postDetail");
                     User author = post != null ? new UserDAO().getUserById(post.getPostedBy()) : null;
-                    UserActivityScore authorScore = author != null ? new UserActivityScoreDAO().getTopUsers(1, "alltime").stream().filter(s -> s.getUserId().equals(author.getUserId())).findFirst().orElse(null) : null;
+                    // Lấy tổng bình luận và lượt thích của tác giả từ UserActivityScore (theo userID)
+                    UserActivityScore authorScore = null;
+                    List<UserActivityScore> allScores = (List<UserActivityScore>) request.getAttribute("topUsers");
+                    if (author != null && allScores != null) {
+                        for (UserActivityScore s : allScores) {
+                            if (s.getUserId().equals(author.getUserId())) {
+                                authorScore = s;
+                                break;
+                            }
+                        }
+                    }
                 %>
                 <aside class="sidebar-left">
                     <div class="widget user-card">
@@ -952,8 +959,66 @@
                             </div>
                             <h3 class="empty-title">Không tìm thấy tác giả</h3>
                         </div>
-                        <% }%>
+                        <% } %>
                     </div>
+                    <!-- Related Posts moved here -->
+                    <section class="related-posts" style="margin-top:2rem;">
+                        <div class="related-header">
+                            <h2 class="related-title">
+                                <i class="fas fa-link"></i>
+                                Bài viết liên quan
+                            </h2>
+                        </div>
+                        <div class="related-list">
+                            <%
+                                List<ForumPost> relatedPosts = (List<ForumPost>) request.getAttribute("relatedPosts");
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                if (relatedPosts != null && !relatedPosts.isEmpty()) {
+                                    for (ForumPost relatedPost : relatedPosts) {
+                                        String relatedPicture = relatedPost.getPicture() != null ? relatedPost.getPicture() : "";
+                                        Timestamp relatedDate = relatedPost.getCreatedDate();
+                                        String formattedRelatedDate = relatedDate != null ? sdf.format(relatedDate) : "";
+                            %>
+                            <a href="<%= request.getContextPath()%>/forum/post/<%= relatedPost.getId()%>" class="related-item">
+                                <div class="related-image">
+                                    <img src="<%= request.getContextPath()%>/<%= relatedPicture != null && !relatedPicture.isEmpty() ? escapeHtml(relatedPicture) : "assets/img/learning.jpg"%>" alt="Related post" />
+                                </div>
+                                <div class="related-content">
+                                    <h3 class="related-post-title">
+                                        <%= escapeHtml(relatedPost.getTitle())%>
+                                    </h3>
+                                    <div class="related-meta">
+                                        <span>
+                                            <i class="fas fa-clock"></i>
+                                            <%= formattedRelatedDate%>
+                                        </span>
+                                        <span>
+                                            <i class="fas fa-comment"></i>
+                                            <%= relatedPost.getCommentCount()%> bình luận
+                                        </span>
+                                        <span>
+                                            <i class="fas fa-eye"></i>
+                                            <%= relatedPost.getViewCount()%> lượt xem
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                            <%
+                                }
+                            } else {
+                            %>
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <h3 class="empty-title">Không có bài viết liên quan</h3>
+                                <p>Hiện tại chưa có bài viết nào cùng danh mục.</p>
+                            </div>
+                            <%
+                                }
+                            %>
+                        </div>
+                    </section>
                 </aside>
 
                 <!-- Main Content -->
@@ -996,7 +1061,6 @@
                     <%
                     } else {
                         ForumPostDAO postDAO = new ForumPostDAO();
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                         String postPicture = post.getPicture() != null ? post.getPicture() : "";
                         Timestamp createdDate = post.getCreatedDate();
                         String formattedDate = createdDate != null ? sdf.format(createdDate) : "";
@@ -1159,62 +1223,7 @@
                             </form>
                         </section>
                     </article>
-                    <section class="related-posts">
-                        <div class="related-header">
-                            <h2 class="related-title">
-                                <i class="fas fa-link"></i>
-                                Bài viết liên quan
-                            </h2>
-                        </div>
-                        <div class="related-list">
-                            <%
-                                List<ForumPost> relatedPosts = (List<ForumPost>) request.getAttribute("relatedPosts");
-                                if (relatedPosts != null && !relatedPosts.isEmpty()) {
-                                    for (ForumPost relatedPost : relatedPosts) {
-                                        String relatedPicture = relatedPost.getPicture() != null ? relatedPost.getPicture() : "";
-                                        Timestamp relatedDate = relatedPost.getCreatedDate();
-                                        String formattedRelatedDate = relatedDate != null ? sdf.format(relatedDate) : "";
-                            %>
-                            <a href="<%= request.getContextPath()%>/forum/post/<%= relatedPost.getId()%>" class="related-item">
-                                <div class="related-image">
-                                    <img src="<%= request.getContextPath()%>/<%= relatedPicture != null && !relatedPicture.isEmpty() ? escapeHtml(relatedPicture) : "assets/img/learning.jpg"%>" alt="Related post" />
-                                </div>
-                                <div class="related-content">
-                                    <h3 class="related-post-title">
-                                        <%= escapeHtml(relatedPost.getTitle())%>
-                                    </h3>
-                                    <div class="related-meta">
-                                        <span>
-                                            <i class="fas fa-clock"></i>
-                                            <%= formattedRelatedDate%>
-                                        </span>
-                                        <span>
-                                            <i class="fas fa-comment"></i>
-                                            <%= relatedPost.getCommentCount()%> bình luận
-                                        </span>
-                                        <span>
-                                            <i class="fas fa-eye"></i>
-                                            <%= relatedPost.getViewCount()%> lượt xem
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
-                            <%
-                                }
-                            } else {
-                            %>
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <i class="fas fa-link"></i>
-                                </div>
-                                <h3 class="empty-title">Không có bài viết liên quan</h3>
-                                <p>Hiện tại chưa có bài viết nào cùng danh mục.</p>
-                            </div>
-                            <%
-                                }
-                            %>
-                        </div>
-                    </section>
+                    
                     <% }%>
                 </div>
 
