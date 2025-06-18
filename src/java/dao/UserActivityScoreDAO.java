@@ -27,7 +27,6 @@ public class UserActivityScoreDAO {
                       "FROM UserActivityScore uas " +
                       "JOIN UserAccount ua ON uas.userID = ua.userID ";
 
-        // Determine sorting based on time frame
         switch (timeFrame) {
             case "weekly":
                 query += "ORDER BY (uas.weeklyComments + uas.weeklyVotes) DESC ";
@@ -66,7 +65,6 @@ public class UserActivityScoreDAO {
                     score.setTotalVotes(rs.getInt("totalVotes"));
                     score.setUser(user);
 
-                    // Set total score based on time frame
                     switch (timeFrame) {
                         case "weekly":
                             score.setTotalScore(score.getWeeklyComments() + score.getWeeklyVotes());
@@ -111,6 +109,31 @@ public class UserActivityScoreDAO {
             LOGGER.info("Updated vote count for user: " + userId + ", increment: " + increment);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error updating vote count: " + e.getMessage(), e);
+            throw e;
+        } finally {
+            dbContext.closeConnection();
+        }
+    }
+
+    public void updateCommentCount(String userId, boolean increment) throws SQLException {
+        String query = "UPDATE UserActivityScore SET totalComments = totalComments + ? WHERE userID = ?";
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, increment ? 1 : -1);
+            stmt.setString(2, userId);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected == 0) {
+                String insertQuery = "INSERT INTO UserActivityScore (userID, weeklyComments, weeklyVotes, monthlyComments, monthlyVotes, totalComments, totalVotes) " +
+                                    "VALUES (?, 0, 0, 0, 0, ?, 0)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+                    insertStmt.setString(1, userId);
+                    insertStmt.setInt(2, increment ? 1 : 0);
+                    insertStmt.executeUpdate();
+                }
+            }
+            LOGGER.info("Updated comment count for user: " + userId + ", increment: " + increment);
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating comment count: " + e.getMessage(), e);
             throw e;
         } finally {
             dbContext.closeConnection();

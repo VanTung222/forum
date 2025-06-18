@@ -1,6 +1,7 @@
 package controller;
 
 import dao.ForumCommentDAO;
+import dao.UserActivityScoreDAO;
 import model.ForumComment;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,10 +17,13 @@ import java.util.logging.Logger;
 public class ForumCommentServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(ForumCommentServlet.class.getName());
     private ForumCommentDAO commentDAO;
+    private UserActivityScoreDAO scoreDAO;
 
     @Override
     public void init() throws ServletException {
         commentDAO = new ForumCommentDAO();
+        scoreDAO = new UserActivityScoreDAO();
+        LOGGER.info("ForumCommentServlet initialized");
     }
 
     @Override
@@ -48,9 +52,10 @@ public class ForumCommentServlet extends HttpServlet {
             comment.setVoteCount(0); // Initialize vote count
 
             commentDAO.createComment(comment);
+            updateUserActivityScore(userId);
 
             request.getSession().setAttribute("message", "Bình luận đã được gửi!");
-            response.sendRedirect(request.getContextPath() + "/forum");
+            response.sendRedirect(request.getContextPath() + "/forum/post/" + postId);
         } catch (SQLException e) {
             LOGGER.severe("Database error: " + e.getMessage());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi cơ sở dữ liệu");
@@ -61,5 +66,10 @@ public class ForumCommentServlet extends HttpServlet {
             LOGGER.severe("Unexpected error: " + e.getMessage());
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi không xác định");
         }
+    }
+
+    private void updateUserActivityScore(String userId) throws SQLException {
+        scoreDAO.updateCommentCount(userId, true);
+        LOGGER.info("Updated UserActivityScore for user: " + userId + " with new comment");
     }
 }

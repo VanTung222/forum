@@ -107,22 +107,7 @@ public class ForumLikeServlet extends HttpServlet {
     }
 
     private void updateUserActivityScore(String userId, boolean isLike) throws SQLException {
-        String query = "UPDATE UserActivityScore SET totalVotes = totalVotes + ? WHERE userID = ?";
-        try (var conn = new utils.DBContext().getConnection();
-             var stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, isLike ? 1 : -1);
-            stmt.setString(2, userId);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
-                // Insert new record if user doesn't exist in UserActivityScore
-                String insertQuery = "INSERT INTO UserActivityScore (userID, totalComments, totalVotes, ranking) VALUES (?, 0, ?, 0)";
-                try (var insertStmt = conn.prepareStatement(insertQuery)) {
-                    insertStmt.setString(1, userId);
-                    insertStmt.setInt(2, isLike ? 1 : 0);
-                    insertStmt.executeUpdate();
-                }
-            }
-            LOGGER.info("Updated UserActivityScore for user: " + userId + ", isLike: " + isLike);
-        }
+        scoreDAO.updateVoteCount(userId, isLike);
+        LOGGER.info("Updated UserActivityScore for user: " + userId + ", isLike: " + isLike);
     }
 }
