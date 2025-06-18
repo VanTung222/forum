@@ -22,7 +22,7 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <div class="message-content">
-                    <div class="message-text"><%= chat[0] %></div>
+                    <div class="message-text"><%= chat[0]%></div>
                 </div>
             </div>
             <div class="chat-message ai-message">
@@ -30,12 +30,12 @@
                     <i class="fas fa-robot"></i>
                 </div>
                 <div class="message-content">
-                    <div class="message-text"><%= chat[1] %></div>
+                    <div class="message-text"><%= chat[1]%></div>
                 </div>
             </div>
             <%
-                    }
-                } else {
+                }
+            } else {
             %>
             <div class="welcome-message">
                 <div class="welcome-icon">
@@ -55,7 +55,7 @@
                     rows="1" 
                     placeholder="Nhập câu hỏi của bạn..." 
                     onkeypress="submitOnEnter(event)"
-                ></textarea>
+                    ></textarea>
                 <button onclick="sendMessage()" class="send-btn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -108,8 +108,14 @@
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(10px); }
-        to { opacity: 1; transform: translateX(0); }
+        from {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     .chatbox-container {
@@ -130,13 +136,13 @@
     }
 
     @keyframes slideUp {
-        from { 
-            transform: translateY(100px) scale(0.9); 
-            opacity: 0; 
+        from {
+            transform: translateY(100px) scale(0.9);
+            opacity: 0;
         }
-        to { 
-            transform: translateY(0) scale(1); 
-            opacity: 1; 
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
     }
 
@@ -238,13 +244,13 @@
     }
 
     @keyframes messageSlide {
-        from { 
-            transform: translateY(20px); 
-            opacity: 0; 
+        from {
+            transform: translateY(20px);
+            opacity: 0;
         }
-        to { 
-            transform: translateY(0); 
-            opacity: 1; 
+        to {
+            transform: translateY(0);
+            opacity: 1;
         }
     }
 
@@ -426,12 +432,12 @@
     function toggleChatbox() {
         var chatbox = document.getElementById("chatbox");
         var toggle = document.getElementById("chatbox-toggle");
-        
+
         if (chatbox.style.display === "none") {
             chatbox.style.display = "block";
             toggle.innerHTML = '<i class="fas fa-times"></i>';
             scrollToBottom();
-            
+
             // Auto-resize textarea
             autoResizeTextarea();
         } else {
@@ -452,18 +458,19 @@
 
     function sendMessage() {
         var userInput = document.getElementById("userInput").value.trim();
-        if (!userInput || isTyping) return;
+        if (!userInput || isTyping)
+            return;
 
         // Add user message
         addMessage(userInput, 'user');
-        
+
         // Clear input
         document.getElementById("userInput").value = "";
         autoResizeTextarea();
-        
+
         // Show typing indicator
         showTypingIndicator();
-        
+
         // Send AJAX request
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "gemini", true);
@@ -471,7 +478,7 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 hideTypingIndicator();
-                
+
                 if (xhr.status === 200) {
                     try {
                         var response = JSON.parse(xhr.responseText);
@@ -489,44 +496,45 @@
 
     function addMessage(text, type) {
         var history = document.getElementById("chatbox-history");
-        
+
         // Remove welcome message if exists
         var welcomeMsg = history.querySelector('.welcome-message');
         if (welcomeMsg) {
             welcomeMsg.remove();
         }
-        
+
         var messageDiv = document.createElement("div");
         messageDiv.className = "chat-message " + type + "-message";
-        
+
         var avatarDiv = document.createElement("div");
         avatarDiv.className = "message-avatar";
         avatarDiv.innerHTML = type === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-        
+
         var contentDiv = document.createElement("div");
         contentDiv.className = "message-content";
-        
+
         var textDiv = document.createElement("div");
         textDiv.className = "message-text";
         textDiv.textContent = text;
-        
+
         contentDiv.appendChild(textDiv);
         messageDiv.appendChild(avatarDiv);
         messageDiv.appendChild(contentDiv);
-        
+
         history.appendChild(messageDiv);
         scrollToBottom();
     }
 
     function showTypingIndicator() {
-        if (isTyping) return;
+        if (isTyping)
+            return;
         isTyping = true;
-        
+
         var history = document.getElementById("chatbox-history");
         var typingDiv = document.createElement("div");
         typingDiv.className = "chat-message ai-message";
         typingDiv.id = "typing-indicator";
-        
+
         typingDiv.innerHTML = `
             <div class="message-avatar">
                 <i class="fas fa-robot"></i>
@@ -541,7 +549,7 @@
                 </div>
             </div>
         `;
-        
+
         history.appendChild(typingDiv);
         scrollToBottom();
     }
@@ -571,20 +579,20 @@
     document.getElementById("userInput").addEventListener('input', autoResizeTextarea);
 
     // Initialize
-    window.onload = function() {
+    window.onload = function () {
         if (document.getElementById("chatbox").style.display === "block") {
             scrollToBottom();
         }
     };
 
     // Close chatbox when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         var chatbox = document.getElementById("chatbox");
         var toggle = document.getElementById("chatbox-toggle");
-        
-        if (chatbox.style.display === "block" && 
-            !chatbox.contains(event.target) && 
-            !toggle.contains(event.target)) {
+
+        if (chatbox.style.display === "block" &&
+                !chatbox.contains(event.target) &&
+                !toggle.contains(event.target)) {
             // Don't auto-close for better UX
             // toggleChatbox();
         }
