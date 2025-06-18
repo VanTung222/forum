@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.ForumComment;
 
 public class ForumPostDAO {
+
     private static final Logger LOGGER = Logger.getLogger(ForumPostDAO.class.getName());
     private final DBContext dbContext;
     private final ForumCommentDAO commentDAO;
@@ -23,8 +25,8 @@ public class ForumPostDAO {
 
     public List<ForumPost> getPostsSortedAndFiltered(String sort, String filter, String search, int page, int size) throws SQLException {
         List<ForumPost> posts = new ArrayList<>();
-        StringBuilder query = new StringBuilder("SELECT fp.id, fp.title, fp.content, fp.postedBy, fp.createdDate, fp.category, fp.viewCount, fp.voteCount, fp.picture, ua.username AS postedByUsername " +
-                                              "FROM ForumPost fp LEFT JOIN UserAccount ua ON fp.postedBy = ua.userID ");
+        StringBuilder query = new StringBuilder("SELECT fp.id, fp.title, fp.content, fp.postedBy, fp.createdDate, fp.category, fp.viewCount, fp.voteCount, fp.picture, ua.username AS postedByUsername "
+                + "FROM ForumPost fp LEFT JOIN UserAccount ua ON fp.postedBy = ua.userID ");
         List<String> conditions = new ArrayList<>();
         List<Object> parameters = new ArrayList<>();
 
@@ -58,8 +60,7 @@ public class ForumPostDAO {
         }
         query.append("LIMIT ? OFFSET ?");
 
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query.toString())) {
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query.toString())) {
             // Set parameters
             for (int i = 0; i < parameters.size(); i++) {
                 stmt.setObject(i + 1, parameters.get(i));
@@ -106,11 +107,10 @@ public class ForumPostDAO {
 
     public ForumPost getPostById(int postId) throws SQLException {
         ForumPost post = null;
-        String query = "SELECT fp.id, fp.title, fp.content, fp.postedBy, fp.createdDate, fp.category, fp.viewCount, fp.voteCount, fp.picture, ua.username AS postedByUsername " +
-                      "FROM ForumPost fp LEFT JOIN UserAccount ua ON fp.postedBy = ua.userID WHERE fp.id = ?";
+        String query = "SELECT fp.id, fp.title, fp.content, fp.postedBy, fp.createdDate, fp.category, fp.viewCount, fp.voteCount, fp.picture, ua.username AS postedByUsername "
+                + "FROM ForumPost fp LEFT JOIN UserAccount ua ON fp.postedBy = ua.userID WHERE fp.id = ?";
 
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, postId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -150,8 +150,7 @@ public class ForumPostDAO {
 
     public void incrementViewCount(int postId) throws SQLException {
         String query = "UPDATE ForumPost SET viewCount = viewCount + 1 WHERE id = ?";
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, postId);
             stmt.executeUpdate();
             LOGGER.info("Incremented view count for post ID: " + postId);
@@ -240,8 +239,7 @@ public class ForumPostDAO {
 
     public boolean hasUserLikedPost(int postId, String userId) throws SQLException {
         String query = "SELECT COUNT(*) FROM ForumCommentVote WHERE commentID IS NULL AND postID = ? AND userID = ?";
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, postId);
             stmt.setString(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -259,10 +257,9 @@ public class ForumPostDAO {
     }
 
     public void createPost(ForumPost post) throws SQLException {
-        String query = "INSERT INTO ForumPost (title, content, postedBy, createdDate, category, viewCount, voteCount, picture) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        String query = "INSERT INTO ForumPost (title, content, postedBy, createdDate, category, viewCount, voteCount, picture) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, post.getTitle());
             stmt.setString(2, post.getContent());
             stmt.setString(3, post.getPostedBy());
@@ -280,7 +277,7 @@ public class ForumPostDAO {
             dbContext.closeConnection();
         }
     }
-    
+
     // Update post
     public boolean updatePost(ForumPost post) {
         String sql = "UPDATE ForumPost SET title = ?, content = ?, category = ?, picture = ? WHERE id = ? AND postedBy = ?";
@@ -313,10 +310,9 @@ public class ForumPostDAO {
 
     public List<ForumPost> getRelatedPosts(int postId, String category, int limit) throws SQLException {
         List<ForumPost> related = new ArrayList<>();
-        String query = "SELECT id, title, content, postedBy, createdDate, category, viewCount, voteCount, picture " +
-                       "FROM ForumPost WHERE category = ? AND id <> ? ORDER BY createdDate DESC LIMIT ?";
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        String query = "SELECT id, title, content, postedBy, createdDate, category, viewCount, voteCount, picture "
+                + "FROM ForumPost WHERE category = ? AND id <> ? ORDER BY createdDate DESC LIMIT ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, category);
             stmt.setInt(2, postId);
             stmt.setInt(3, limit);
@@ -339,5 +335,24 @@ public class ForumPostDAO {
             dbContext.closeConnection();
         }
         return related;
+    }
+
+    public void createComment(ForumComment comment) throws SQLException {
+        String query = "INSERT INTO ForumComment (postID, commentText, commentedBy, commentedDate, voteCount) "
+                + "VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, comment.getPostID());
+            stmt.setString(2, comment.getCommentText());
+            stmt.setString(3, comment.getCommentedBy());
+            stmt.setTimestamp(4, comment.getCommentedDate());
+            stmt.setInt(5, comment.getVoteCount());
+            stmt.executeUpdate();
+            LOGGER.info("Created new comment for postID: " + comment.getPostID() + " by user: " + comment.getCommentedBy());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error creating comment: " + e.getMessage(), e);
+            throw e;
+        } finally {
+            dbContext.closeConnection();
+        }
     }
 }

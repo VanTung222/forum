@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 @WebServlet(name = "ForumServlet", urlPatterns = {"/forum", "/forum/createPost", "/forum/post/*", "/forum/deletePost"})
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10, maxRequestSize = 1024 * 1024 * 50)
 public class ForumServlet extends HttpServlet {
+
     private static final Logger LOGGER = Logger.getLogger(ForumServlet.class.getName());
     private ForumPostDAO postDAO;
     private UserActivityScoreDAO scoreDAO;
@@ -80,11 +81,11 @@ public class ForumServlet extends HttpServlet {
                 // Handle forum main page
                 String sort = request.getParameter("sort") != null ? request.getParameter("sort") : "newest";
                 String filter = request.getParameter("filter") != null ? request.getParameter("filter") : "all";
-                String search = request.getParameter("search"); // Get search parameter
+                String search = request.getParameter("search");
                 int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
                 int size = 10;
 
-                if (!VALID_SORTS.contains(sort)) {
+                if (!VALID_SORTS.contains(sort) && !Arrays.asList("weekly", "monthly", "alltime").contains(sort)) {
                     sort = "newest";
                     LOGGER.warning("Invalid sort parameter, defaulting to newest");
                 }
@@ -97,18 +98,29 @@ public class ForumServlet extends HttpServlet {
                     LOGGER.warning("Invalid page parameter, defaulting to 1");
                 }
 
-                // Pass search parameter to DAO
                 List<ForumPost> posts = postDAO.getPostsSortedAndFiltered(sort, filter, search, page, size);
-                List<UserActivityScore> topUsers = scoreDAO.getTopUsers(3);
+
+                // Handle leaderboard with 100 users
+                int limit = 100;
+                String timeFrame = "alltime"; // Default to alltime
+                if ("weekly".equals(sort)) {
+                    timeFrame = "weekly";
+                } else if ("monthly".equals(sort)) {
+                    timeFrame = "monthly";
+                } else if ("alltime".equals(sort)) {
+                    timeFrame = "alltime";
+                }
+                List<UserActivityScore> topUsers = scoreDAO.getTopUsers(limit, timeFrame);
                 request.setAttribute("topUsers", topUsers);
+                request.setAttribute("timeFrame", timeFrame); // Pass timeFrame to JSP
 
                 request.setAttribute("posts", posts);
                 request.setAttribute("sort", sort);
                 request.setAttribute("filter", filter);
                 request.setAttribute("page", page);
-                request.setAttribute("search", search); // Set search attribute for JSP
+                request.setAttribute("search", search);
 
-                LOGGER.info("Forwarding to /view/forum.jsp with sort: " + sort + ", filter: " + filter + ", search: " + search + ", page: " + page);
+                LOGGER.info("Forwarding to /view/forum.jsp with sort: " + sort + ", filter: " + filter + ", search: " + search + ", page: " + page + ", timeFrame: " + timeFrame);
                 request.getRequestDispatcher("/view/forum.jsp").forward(request, response);
             }
         } catch (SQLException e) {
@@ -142,8 +154,8 @@ public class ForumServlet extends HttpServlet {
                 String title = request.getParameter("postTitle");
                 String content = request.getParameter("postContent");
                 String category = request.getParameter("postCategory");
-                if (title == null || title.trim().isEmpty() || content == null || content.trim().isEmpty() || 
-                    category == null || category.trim().isEmpty()) {
+                if (title == null || title.trim().isEmpty() || content == null || content.trim().isEmpty()
+                        || category == null || category.trim().isEmpty()) {
                     request.getSession().setAttribute("message", "Tiêu đề, nội dung và chủ đề không được để trống");
                     response.sendRedirect(request.getContextPath() + "/forum");
                     return;
@@ -200,10 +212,10 @@ public class ForumServlet extends HttpServlet {
                     userId = "U001";
                     request.getSession().setAttribute("userId", userId);
                 }
-                
+
                 int postId = Integer.parseInt(request.getParameter("postId"));
                 boolean deleted = postDAO.deletePost(postId, userId);
-                
+
                 if (deleted) {
                     request.getSession().setAttribute("message", "Xóa bài viết thành công!");
                     response.sendRedirect(request.getContextPath() + "/forum");

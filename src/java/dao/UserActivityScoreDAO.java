@@ -20,13 +20,27 @@ public class UserActivityScoreDAO {
         this.dbContext = new DBContext();
     }
 
-    public List<UserActivityScore> getTopUsers(int limit) throws SQLException {
+    public List<UserActivityScore> getTopUsers(int limit, String timeFrame) throws SQLException {
         List<UserActivityScore> scores = new ArrayList<>();
-        String query = "SELECT uas.id, uas.userID, uas.totalComments, uas.totalVotes, uas.ranking, " +
+        String query = "SELECT uas.id, uas.userID, uas.weeklyComments, uas.weeklyVotes, uas.monthlyComments, uas.monthlyVotes, uas.totalComments, uas.totalVotes, " +
                       "ua.fullName, ua.username, ua.email, ua.role, ua.profilePicture " +
                       "FROM UserActivityScore uas " +
-                      "JOIN UserAccount ua ON uas.userID = ua.userID " +
-                      "ORDER BY uas.totalComments + uas.totalVotes DESC, uas.ranking ASC LIMIT ?";
+                      "JOIN UserAccount ua ON uas.userID = ua.userID ";
+
+        // Determine sorting based on time frame
+        switch (timeFrame) {
+            case "weekly":
+                query += "ORDER BY (uas.weeklyComments + uas.weeklyVotes) DESC ";
+                break;
+            case "monthly":
+                query += "ORDER BY (uas.monthlyComments + uas.monthlyVotes) DESC ";
+                break;
+            case "alltime":
+            default:
+                query += "ORDER BY (uas.totalComments + uas.totalVotes) DESC ";
+                break;
+        }
+        query += "LIMIT ?";
 
         try (Connection conn = dbContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -44,13 +58,30 @@ public class UserActivityScoreDAO {
                     UserActivityScore score = new UserActivityScore();
                     score.setId(rs.getInt("id"));
                     score.setUserId(rs.getString("userID"));
+                    score.setWeeklyComments(rs.getInt("weeklyComments"));
+                    score.setWeeklyVotes(rs.getInt("weeklyVotes"));
+                    score.setMonthlyComments(rs.getInt("monthlyComments"));
+                    score.setMonthlyVotes(rs.getInt("monthlyVotes"));
                     score.setTotalComments(rs.getInt("totalComments"));
                     score.setTotalVotes(rs.getInt("totalVotes"));
-                    score.setRanking(rs.getInt("ranking"));
                     score.setUser(user);
+
+                    // Set total score based on time frame
+                    switch (timeFrame) {
+                        case "weekly":
+                            score.setTotalScore(score.getWeeklyComments() + score.getWeeklyVotes());
+                            break;
+                        case "monthly":
+                            score.setTotalScore(score.getMonthlyComments() + score.getMonthlyVotes());
+                            break;
+                        case "alltime":
+                        default:
+                            score.setTotalScore(score.getTotalComments() + score.getTotalVotes());
+                            break;
+                    }
                     scores.add(score);
                 }
-                LOGGER.info("Retrieved " + scores.size() + " top users");
+                LOGGER.info("Retrieved " + scores.size() + " top users for time frame: " + timeFrame);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error retrieving top users: " + e.getMessage(), e);
@@ -69,7 +100,8 @@ public class UserActivityScoreDAO {
             stmt.setString(2, userId);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                String insertQuery = "INSERT INTO UserActivityScore (userID, totalComments, totalVotes, ranking) VALUES (?, 0, ?, 0)";
+                String insertQuery = "INSERT INTO UserActivityScore (userID, weeklyComments, weeklyVotes, monthlyComments, monthlyVotes, totalComments, totalVotes) " +
+                                    "VALUES (?, 0, 0, 0, 0, 0, ?)";
                 try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
                     insertStmt.setString(1, userId);
                     insertStmt.setInt(2, increment ? 1 : 0);
