@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ForumCommentDAO {
+
     private static final Logger LOGGER = Logger.getLogger(ForumCommentDAO.class.getName());
     private final DBContext dbContext;
 
@@ -21,8 +22,7 @@ public class ForumCommentDAO {
 
     public List<ForumComment> getCommentsByPostId(int postId) throws SQLException {
         List<ForumComment> comments = new ArrayList<>();
-        String query = "SELECT id, postID, commentText, commentedBy, commentedDate, voteCount " +
-                      "FROM ForumComment WHERE postID = ? ORDER BY commentedDate ASC";
+        String query = "SELECT id, postID, commentText, commentedBy, commentedDate, voteCount FROM ForumComment WHERE postID = ?";
 
         try (Connection conn = dbContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -38,7 +38,7 @@ public class ForumCommentDAO {
                     comment.setVoteCount(rs.getInt("voteCount"));
                     comments.add(comment);
                 }
-                LOGGER.info("Retrieved " + comments.size() + " comments for postID: " + postId);
+                LOGGER.info("Retrieved " + comments.size() + " comments for post ID: " + postId);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error retrieving comments: " + e.getMessage(), e);
@@ -50,17 +50,16 @@ public class ForumCommentDAO {
     }
 
     public void createComment(ForumComment comment) throws SQLException {
-        String query = "INSERT INTO ForumComment (postID, commentText, commentedBy, commentedDate, voteCount) " +
-                      "VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        String query = "INSERT INTO ForumComment (postID, commentText, commentedBy, commentedDate, voteCount) "
+                + "VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, comment.getPostID());
             stmt.setString(2, comment.getCommentText());
             stmt.setString(3, comment.getCommentedBy());
             stmt.setTimestamp(4, comment.getCommentedDate());
             stmt.setInt(5, comment.getVoteCount());
             stmt.executeUpdate();
-            LOGGER.info("Created new comment for postID: " + comment.getPostID());
+            LOGGER.info("Created new comment for postID: " + comment.getPostID() + " by user: " + comment.getCommentedBy());
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error creating comment: " + e.getMessage(), e);
             throw e;

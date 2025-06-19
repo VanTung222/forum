@@ -139,4 +139,35 @@ public class UserActivityScoreDAO {
             dbContext.closeConnection();
         }
     }
+    public UserActivityScore getUserActivityScore(String userId) throws SQLException {
+        String query = "SELECT userID, totalComments, totalVotes, " +
+                  "weeklyComments, weeklyVotes, " +
+                  "monthlyComments, monthlyVotes " +
+                  "FROM UserActivityScore WHERE userID = ?";
+
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    UserActivityScore score = new UserActivityScore();
+                    score.setUserId(rs.getString("userID"));
+                    score.setTotalComments(rs.getInt("totalComments"));
+                    score.setTotalVotes(rs.getInt("totalVotes"));
+                    score.setWeeklyComments(rs.getInt("weeklyComments"));
+                    score.setWeeklyVotes(rs.getInt("weeklyVotes"));
+                    score.setMonthlyComments(rs.getInt("monthlyComments"));
+                    score.setMonthlyVotes(rs.getInt("monthlyVotes"));
+                    score.setTotalScore(score.getTotalComments() + score.getTotalVotes());
+                    return score;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving user activity score: " + e.getMessage(), e);
+            throw e;
+        } finally {
+            dbContext.closeConnection();
+        }
+        return null;
+    }
 }

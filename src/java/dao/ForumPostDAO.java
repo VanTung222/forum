@@ -355,4 +355,51 @@ public class ForumPostDAO {
             dbContext.closeConnection();
         }
     }
+    
+    public List<ForumPost> getPostsByUserId(String userId, int limit) throws SQLException {
+        List<ForumPost> posts = new ArrayList<>();
+        String query = "SELECT id, title, content, postedBy, createdDate, category, viewCount, voteCount, picture "
+                + "FROM ForumPost WHERE postedBy = ? ORDER BY createdDate DESC LIMIT ?";
+
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, userId);
+            stmt.setInt(2, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ForumPost post = new ForumPost();
+                    post.setId(rs.getInt("id"));
+                    post.setTitle(rs.getString("title"));
+                    post.setContent(rs.getString("content"));
+                    post.setPostedBy(rs.getString("postedBy"));
+                    post.setCreatedDate(rs.getTimestamp("createdDate"));
+                    post.setCategory(rs.getString("category"));
+                    post.setViewCount(rs.getInt("viewCount"));
+                    post.setVoteCount(rs.getInt("voteCount"));
+                    post.setPicture(rs.getString("picture"));
+
+                    // Get comment count
+                    String commentCountQuery = "SELECT COUNT(*) AS commentCount FROM ForumComment WHERE postID = ?";
+                    try (PreparedStatement countStmt = conn.prepareStatement(commentCountQuery)) {
+                        countStmt.setInt(1, post.getId());
+                        try (ResultSet countRs = countStmt.executeQuery()) {
+                            if (countRs.next()) {
+                                post.setCommentCount(countRs.getInt("commentCount"));
+                            }
+                        }
+                    }
+
+                    posts.add(post);
+                }
+                LOGGER.info("Retrieved " + posts.size() + " posts for user: " + userId);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving posts for user: " + e.getMessage(), e);
+            throw e;
+        } finally {
+            dbContext.closeConnection();
+        }
+        return posts;
+    }
 }

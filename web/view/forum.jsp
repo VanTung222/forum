@@ -1,4 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page import="java.util.List, dao.UserDAO, model.ForumPost, model.ForumComment, model.UserActivityScore, model.User, java.text.SimpleDateFormat, java.sql.Timestamp, dao.ForumPostDAO" %>
 <%!
     public String escapeHtml(String input) {
@@ -12,416 +14,416 @@
     }
 %>
 <!DOCTYPE html>
-<html lang="vi">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Diễn Đàn Luyện Thi HIKARI</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-        <style>
-            :root {
-                --primary: #4f8cff;
-                --secondary: #232946;
-                --accent: #f7c873;
-                --bg: #f4f6fb;
-                --card-bg: #fff;
-                --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-                --radius: 18px;
-                --transition: 0.25s cubic-bezier(0.4, 2, 0.6, 1);
-                --like-color: #4f8cff;
-                --comment-color: #9b59b6;
-                --share-color: #1abc9c;
-            }
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-            }
-            body {
-                font-family: "Segoe UI", "Roboto", Arial, sans-serif;
-                background: var(--bg);
-                min-height: 100vh;
-                overflow-x: hidden;
-            }
-            .topbar {
-                width: 100%;
-                background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
-                color: #fff;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 32px;
-                height: 62px;
-                box-shadow: 0 2px 12px rgba(79, 140, 255, 0.07);
-                position: sticky;
-                top: 0;
-                z-index: 100;
-            }
-            .topbar .logo {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                font-size: 1.3rem;
-                font-weight: 700;
-                letter-spacing: 1px;
-            }
-            .topbar .logo-icon {
-                width: 48px;
-                height: 48px;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-            .logo-icon .logo-img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-            }
-            .topbar .nav {
-                display: flex;
-                gap: 24px;
-                align-items: center;
-            }
-            .topbar .nav a {
-                color: #fff;
-                text-decoration: none;
-                font-weight: 500;
-                font-size: 1rem;
-                padding: 8px 14px;
-                border-radius: 8px;
-                transition: background 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .topbar .nav a.active,
-            .topbar .nav a:hover {
-                background: rgba(255, 255, 255, 0.13);
-            }
-            .topbar .account-dropdown {
-                position: relative;
-            }
-            .topbar .account-btn {
-                background: none;
-                border: none;
-                color: #fff;
-                font-size: 1rem;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                cursor: pointer;
-                padding: 8px 14px;
-                border-radius: 8px;
-                transition: background 0.2s;
-            }
-            .topbar .account-btn:hover {
-                background: rgba(255, 255, 255, 0.13);
-            }
-            .topbar .dropdown-menu {
-                display: none;
-                position: absolute;
-                right: 0;
-                top: 110%;
-                background: #fff;
-                color: var(--secondary);
-                min-width: 160px;
-                border-radius: 10px;
-                box-shadow: 0 4px 24px rgba(31, 38, 135, 0.13);
-                z-index: 10;
-                overflow: hidden;
-            }
-            .topbar .dropdown-menu a {
-                display: block;
-                padding: 12px 18px;
-                color: var(--secondary);
-                text-decoration: none;
-                font-weight: 500;
-                transition: background 0.2s;
-            }
-            .topbar .dropdown-menu a:hover {
-                background: var(--bg);
-            }
-            .topbar .account-dropdown.open .dropdown-menu {
-                display: block;
-            }
-            .avatar {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .avatar img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            .avatar.sm {
-                width: 24px;
-                height: 24px;
-            }
-            .layout {
-                display: flex;
-                width: 100%;
-                min-height: calc(100vh - 62px);
-            }
-            .sidebar-left {
-                width: 260px;
-                background: var(--card-bg);
-                box-shadow: var(--shadow);
-                padding: 32px 18px;
-                position: fixed;
-                top: 62px;
-                left: 0;
-                height: calc(100vh - 62px);
-                overflow-y: auto;
-                z-index: 50;
-            }
-            .sidebar-left .topics {
-                margin-top: 0;
-            }
-            .sidebar-left .topics-title {
-                font-weight: 700;
-                color: var(--primary);
-                margin-bottom: 20px;
-                font-size: 1.1em;
-            }
-            .sidebar-left .topic-list {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-            .sidebar-left .topic-list li {
-                margin-bottom: 12px;
-            }
-            .sidebar-left .topic-list a {
-                color: var(--secondary);
-                text-decoration: none;
-                font-size: 1em;
-                padding: 12px 14px;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                transition: background 0.2s, color 0.2s;
-            }
-            .sidebar-left .topic-list a.active,
-            .sidebar-left .topic-list a:hover {
-                background: var(--primary);
-                color: #fff;
-            }
-            .main-content {
-                flex: 1;
-                padding: 32px;
-                margin-left: 260px;
-            }
-            .forum-toolbar {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                justify-content: space-between;
-                gap: 16px;
-                margin-bottom: 24px;
-            }
-            .forum-toolbar h1 {
-                font-size: 1.5rem;
-                color: var(--secondary);
-            }
-            .forum-toolbar .toolbar-actions {
-                display: flex;
-                gap: 16px;
-                align-items: center;
-                flex-wrap: wrap;
-            }
-            .forum-toolbar .filters {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-            .forum-toolbar input[type="text"] {
-                border-radius: 8px;
-                border: 1.5px solid #eaf1ff;
-                padding: 10px 14px;
-                font-size: 1em;
-                background: #f9fbfc;
-                color: var(--secondary);
-                outline: none;
-                transition: border 0.2s;
-                min-width: 200px;
-            }
-            .forum-toolbar input[type="text"]:focus {
-                border-color: var(--primary);
-            }
-            .forum-toolbar select {
-                border-radius: 8px;
-                border: 1.5px solid #eaf1ff;
-                padding: 10px 14px;
-                font-size: 1em;
-                background: #f9fbfc;
-                color: var(--secondary);
-                outline: none;
-                transition: border 0.2s;
-                min-width: 160px;
-            }
-            .forum-toolbar select:focus {
-                border-color: var(--primary);
-            }
-            .post-list {
-                display: flex;
-                flex-direction: column;
-                gap: 18px;
-            }
-            .post-card {
-                background: var(--card-bg);
-                border-radius: 14px;
-                box-shadow: var(--shadow);
-                padding: 20px 18px;
-                transition: box-shadow 0.2s, transform 0.2s;
-                position: relative;
-            }
-            .post-card:hover {
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
-                transform: translateY(-2px) scale(1.01);
-            }
-            .post-card .post-image {
-                width: 100%;
-                max-height: 300px;
-                border-radius: 8px;
-                overflow: hidden;
-                margin-top: 10px;
-            }
-            .post-card .post-image img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            .post-card .post-content {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .post-card .post-header {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                margin-bottom: 4px;
-            }
-            .post-card .author-info {
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
-            }
-            .post-card .author-name {
-                font-weight: 600;
-                color: var(--secondary);
-                font-size: 1em;
-            }
-            .post-card .post-meta {
-                display: flex;
-                gap: 12px;
-                align-items: center;
-                color: #7f8c8d;
-                font-size: 0.95em;
-            }
-            .post-card .post-title {
-                font-size: 1.18em;
-                font-weight: bold;
-                color: var(--primary);
-                margin-bottom: 8px;
-                text-decoration: none;
-                cursor: pointer;
-                transition: color 0.2s;
-            }
-            .post-card .post-title:hover {
-                color: var(--accent);
-                text-decoration: underline;
-            }
-            .post-card .post-body {
-                font-size: 1em;
-                color: var(--secondary);
-                line-height: 1.6;
-                margin-bottom: 10px;
-            }
-            .post-card .post-tags {
-                display: flex;
-                gap: 8px;
-                flex-wrap: wrap;
-                margin-left: auto;
-            }
-            .post-card .tag {
-                background: #eaf1ff;
-                color: var(--primary);
-                border-radius: 8px;
-                padding: 4px 10px;
-                font-size: 0.92em;
-                font-weight: 500;
-            }
-            .post-card .post-actions {
-                display: flex;
-                gap: 18px;
-                align-items: center;
-                margin-top: 6px;
-                justify-content: flex-end;
-            }
-            .post-card .action-btn {
-                background: none;
-                border: none;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                padding: 6px 14px;
-                border-radius: 15px;
-                transition: all 0.2s;
-                font-size: 1em;
-                font-weight: 500;
-            }
-            .post-card .action-btn.like-btn {
-                color: #7f8c8d;
-            }
-            .post-card .action-btn.like-btn.liked {
-                color: var(--like-color);
-            }
-            .post-card .action-btn.comment-btn {
-                color: var(--comment-color);
-            }
-            .post-card .action-btn:hover {
-                background: #eaf1ff;
-                transform: scale(1.05);
-            }
-            .comment-section {
-                margin-top: 20px;
-                padding: 10px;
-                border-top: 1px solid #eee;
-            }
-            .comment {
-                display: flex;
-                gap: 10px;
-                margin-bottom: 15px;
-            }
-            .comment-content {
-                flex: 1;
-            }
-            .comment-time {
-                font-size: 0.9em;
-                color: #7f8c8d;
-            }
-            .comment-form {
-                display: flex;
-                gap: 10px;
-                margin-top: 10px;
-            }
-            .comment-form textarea {
-                flex: 1;
-                padding: 10px;
-                border: 1.5px solid #eaf1ff;
-                border-radius: 8px;
-                font-size: 0.95em;
-                min-height: 40px;
-                resize: none;
-            }
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diễn Đàn Luyện Thi HIKARI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #4f8cff;
+            --secondary: #232946;
+            --accent: #f7c873;
+            --bg: #f4f6fb;
+            --card-bg: #fff;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            --radius: 18px;
+            --transition: 0.25s cubic-bezier(0.4, 2, 0.6, 1);
+            --like-color: #4f8cff;
+            --comment-color: #9b59b6;
+            --share-color: #1abc9c;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .topbar {
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            height: 62px;
+            box-shadow: 0 2px 12px rgba(79, 140, 255, 0.07);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .topbar .logo-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .logo-icon .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .topbar .nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .topbar .nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .topbar .nav a.active,
+        .topbar .nav a:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .topbar .account-dropdown {
+            position: relative;
+        }
+        .topbar .account-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .topbar .account-btn:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .topbar .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: #fff;
+            color: var(--secondary);
+            min-width: 160px;
+            border-radius: 10px;
+            box-shadow: 0 4px 24px rgba(31, 38, 135, 0.13);
+            z-index: 10;
+            overflow: hidden;
+        }
+        .topbar .dropdown-menu a {
+            display: block;
+            padding: 12px 18px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .topbar .dropdown-menu a:hover {
+            background: var(--bg);
+        }
+        .topbar .account-dropdown.open .dropdown-menu {
+            display: block;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar.sm {
+            width: 24px;
+            height: 24px;
+        }
+        .layout {
+            display: flex;
+            width: 100%;
+            min-height: calc(100vh - 62px);
+        }
+        .sidebar-left {
+            width: 260px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 32px 18px;
+            position: fixed;
+            top: 62px;
+            left: 0;
+            height: calc(100vh - 62px);
+            overflow-y: auto;
+            z-index: 50;
+        }
+        .sidebar-left .topics {
+            margin-top: 0;
+        }
+        .sidebar-left .topics-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .sidebar-left .topic-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-left .topic-list li {
+            margin-bottom: 12px;
+        }
+        .sidebar-left .topic-list a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 1em;
+            padding: 12px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar-left .topic-list a.active,
+        .sidebar-left .topic-list a:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            margin-left: 260px;
+        }
+        .forum-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .forum-toolbar h1 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+        .forum-toolbar .toolbar-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .forum-toolbar .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .forum-toolbar input[type="text"] {
+            border-radius: 8px;
+            border: 1.5px solid #eaf1ff;
+            padding: 10px 14px;
+            font-size: 1em;
+            background: #f9fbfc;
+            color: var(--secondary);
+            outline: none;
+            transition: border 0.2s;
+            min-width: 200px;
+        }
+        .forum-toolbar input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+        .forum-toolbar select {
+            border-radius: 8px;
+            border: 1.5px solid #eaf1ff;
+            padding: 10px 14px;
+            font-size: 1em;
+            background: #f9fbfc;
+            color: var(--secondary);
+            outline: none;
+            transition: border 0.2s;
+            min-width: 160px;
+        }
+        .forum-toolbar select:focus {
+            border-color: var(--primary);
+        }
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .post-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            padding: 20px 18px;
+            transition: box-shadow 0.2s, transform 0.2s;
+            position: relative;
+        }
+        .post-card:hover {
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.13);
+            transform: translateY(-2px) scale(1.01);
+        }
+        .post-card .post-image {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .post-card .post-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post-card .post-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .post-card .post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+        .post-card .author-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .post-card .author-name {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 1em;
+        }
+        .post-card .post-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            color: #7f8c8d;
+            font-size: 0.95em;
+        }
+        .post-card .post-title {
+            font-size: 1.18em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .post-card .post-title:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+        .post-card .post-body {
+            font-size: 1em;
+            color: var(--secondary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .post-card .post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+        .post-card .tag {
+            background: #eaf1ff;
+            color: var(--primary);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 0.92em;
+            font-weight: 500;
+        }
+        .post-card .post-actions {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            margin-top: 6px;
+            justify-content: flex-end;
+        }
+        .post-card .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 15px;
+            transition: all 0.2s;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        .post-card .action-btn.like-btn {
+            color: #7f8c8d;
+        }
+        .post-card .action-btn.like-btn.liked {
+            color: var(--like-color);
+        }
+        .post-card .action-btn.comment-btn {
+            color: var(--comment-color);
+        }
+        .post-card .action-btn:hover {
+            background: #eaf1ff;
+            transform: scale(1.05);
+        }
+        .comment-section {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .comment {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .comment-content {
+            flex: 1;
+        }
+        .comment-time {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+        .comment-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .comment-form textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1.5px solid #eaf1ff;
+            border-radius: 8px;
+            font-size: 0.95em;
+            min-height: 40px;
+            resize: none;
+        }
             .sidebar-right {
                 width: 300px;
                 background: var(--card-bg);
@@ -822,7 +824,7 @@
                             <select id="filterSelect" onchange="handleFilterChange()">
                                 <option value="all" <%= "all".equals(request.getAttribute("filter")) ? "selected" : ""%>>Tất Cả</option>
                                 <option value="with-replies" <%= "with-replies".equals(request.getAttribute("filter")) ? "selected" : ""%>>Có Phản Hồi</option>
-                                <option value="no-replies" <%= "no-replies".equals(request.getAttribute("filter")) ? "selected" : ""%>>Chưa Có Phản Hồi</option>
+                                <option value="no-replies" <%= "no-replies".equals(request.getAttribute("filter")) ? "selected" : ""%>Chưa Có Phản Hồi</option>
                             </select>
                         </div>
                     </div>
@@ -847,9 +849,10 @@
                     <div class="post-card" data-tags="<%= escapeHtml(post.getCategory())%>">
                         <div class="post-content">
                             <div class="post-header">
-                                <div class="avatar">
+                                <%-- Update avatar image to be a clickable link --%>
+                                <a href="<%= request.getContextPath()%>/profile?userId=<%= escapeHtml(post.getPostedBy())%>" class="avatar" style="text-decoration: none;">
                                     <img src="<%= request.getContextPath()%>/assets/images/avatar<%= escapeHtml(post.getPostedBy())%>.png" alt="Avatar" />
-                                </div>
+                                </a>
                                 <div class="author-info">
                                     <span class="author-name"><%= escapeHtml(new UserDAO().getUsernameByUserID(post.getPostedBy()))%></span>
                                     <div class="post-meta">
@@ -905,7 +908,7 @@
                                     }
                                 %>
                                 <form action="<%= request.getContextPath()%>/forum/createComment" method="post" class="comment-form">
-                                    <input type="hidden" name="postId" value="<%= post.getId()%>">
+                                    <input type="hidden" name="postId" value="${post.id}">
                                     <textarea name="commentText" placeholder="Viết bình luận..." required></textarea>
                                     <button type="submit" class="btn btn-primary">Gửi</button>
                                 </form>
