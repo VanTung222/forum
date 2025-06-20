@@ -119,33 +119,6 @@
         .topbar .account-btn:hover {
             background: rgba(255, 255, 255, 0.13);
         }
-        .topbar .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 110%;
-            background: #fff;
-            color: var(--secondary);
-            min-width: 160px;
-            border-radius: 10px;
-            box-shadow: 0 4px 24px rgba(31, 38, 135, 0.13);
-            z-index: 10;
-            overflow: hidden;
-        }
-        .topbar .dropdown-menu a {
-            display: block;
-            padding: 12px 18px;
-            color: var(--secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .topbar .dropdown-menu a:hover {
-            background: var(--bg);
-        }
-        .topbar .account-dropdown.open .dropdown-menu {
-            display: block;
-        }
         .avatar {
             width: 32px;
             height: 32px;
@@ -159,10 +132,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        .avatar.sm {
-            width: 24px;
-            height: 24px;
         }
         .layout {
             display: flex;
@@ -744,33 +713,20 @@
                 <div class="logo-icon">
                     <img src="<%= request.getContextPath()%>/assets/img/logo.png" alt="Logo" class="logo-img" />
                 </div>
-                Diễn Đàn Luyện Thi JLPT
+                Diễn Đàn HIKARI
             </div>
             <nav class="nav">
                 <a href="<%= request.getContextPath()%>/"><i class="fas fa-home"></i> Trang Chủ</a>
                 <a href="<%= request.getContextPath()%>/contact"><i class="fas fa-phone"></i> Liên Hệ</a>
-                <div class="account-dropdown" id="accountDropdown">
-                    <button class="account-btn" onclick="toggleDropdown(event)">
-                        <div class="avatar sm">
+                <a href="<%= request.getContextPath() %>/profile?user=" + userID() class="nav-link ">
+                    <i class="fas fa-user"></i>
+                    <span>Hồ sơ</span>
+                </a>
+                <div class="account-dropdown">
+                        <div class="avatar">
                             <img src="<%= request.getContextPath()%>/assets/img/avatar.png" alt="Avatar" />
                         </div>
-                        <%= escapeHtml((String) request.getAttribute("username"))%> <i class="fas fa-caret-down"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                        <%
-                            String username = (String) request.getAttribute("username");
-                            if ("Guest".equals(username)) {
-                        %>
-                        <a href="<%= request.getContextPath()%>/login"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</a>
-                        <%
-                        } else {
-                        %>
-                        <a href="<%= request.getContextPath()%>/profile"><i class="fas fa-user"></i> Hồ Sơ Cá Nhân</a>
-                        <a href="<%= request.getContextPath()%>/logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
-                        <%
-                            }
-                        %>
-                    </div>
+
                 </div>
             </nav>
         </div>
@@ -1091,13 +1047,7 @@
             </div>
         </div>
         <script>
-            function toggleDropdown(e) {
-                e.stopPropagation();
-                document.getElementById("accountDropdown").classList.toggle("open");
-            }
-            document.body.addEventListener("click", function () {
-                document.getElementById("accountDropdown").classList.remove("open");
-            });
+            
             function openPostModal() {
                 document.getElementById("createPostModal").classList.add("active");
             }

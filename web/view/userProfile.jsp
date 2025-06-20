@@ -590,10 +590,6 @@
                     <i class="fas fa-user"></i>
                     <span>Hồ sơ</span>
                 </a>
-                <a href="<%= request.getContextPath() %>/logout" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Đăng xuất</span>
-                </a>
             </nav>
         </div>
     </header>

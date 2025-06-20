@@ -54,24 +54,93 @@
             min-height: 100vh;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
+        .topbar {
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 64px;
+            padding: 0 32px;
+            height: 62px;
+            box-shadow: 0 2px 12px rgba(79, 140, 255, 0.07);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .topbar .logo-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .logo-icon .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .topbar .nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .topbar .nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .topbar .nav a.active,
+        .topbar .nav a:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .topbar .account-dropdown {
+            position: relative;
+        }
+        .topbar .account-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .topbar .account-btn:hover {
+            background: rgba(255, 255, 255, 0.13);
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .logo {
@@ -84,44 +153,7 @@
             text-decoration: none;
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius);
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .nav {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
+        
         /* Main Container */
         .container {
             max-width: 800px;
@@ -511,31 +543,28 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-container">
-            <a href="<%= request.getContextPath() %>/" class="logo">
+    <div class="topbar">
+            <div class="logo">
                 <div class="logo-icon">
-                    <img src="<%= request.getContextPath() %>/assets/img/logo.png" alt="Logo" />
+                    <img src="<%= request.getContextPath()%>/assets/img/logo.png" alt="Logo" class="logo-img" />
                 </div>
-                <span>JLPT Learning</span>
-            </a>
-
+                Diễn Đàn HIKARI
+            </div>
             <nav class="nav">
-                <a href="<%= request.getContextPath() %>/" class="nav-link">
-                    <i class="fas fa-home"></i>
-                    <span>Trang chủ</span>
+                <a href="<%= request.getContextPath()%>/"><i class="fas fa-home"></i> Trang Chủ</a>
+                <a href="<%= request.getContextPath()%>/contact"><i class="fas fa-phone"></i> Liên Hệ</a>
+                <a href="<%= request.getContextPath() %>/profile?user=" + userID() class="nav-link ">
+                    <i class="fas fa-user"></i>
+                    <span>Hồ sơ</span>
                 </a>
-                <a href="<%= request.getContextPath() %>/forum" class="nav-link active">
-                    <i class="fas fa-comments"></i>
-                    <span>Diễn đàn</span>
-                </a>
-                <a href="<%= request.getContextPath() %>/contact" class="nav-link">
-                    <i class="fas fa-envelope"></i>
-                    <span>Liên hệ</span>
-                </a>
+                <div class="account-dropdown">
+                        <div class="avatar">
+                            <img src="<%= request.getContextPath()%>/assets/img/avatar.png" alt="Avatar" />
+                        </div>
+
+                </div>
             </nav>
         </div>
-    </header>
 
     <div class="container">
         <nav class="breadcrumb fade-in">

@@ -21,7 +21,6 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <style>
-
             :root {
                 --primary: #4f8cff;
                 --secondary: #232946;
@@ -47,83 +46,92 @@
                 color: #222b45;
                 background: transparent;
             }
-            .header {
-                background: #fff;
-                border-bottom: 1px solid #e5e7eb;
-                box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+            .topbar {
+                width: 100%;
+                background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
+                color: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 32px;
+                height: 62px;
+                box-shadow: 0 2px 12px rgba(79, 140, 255, 0.07);
                 position: sticky;
                 top: 0;
                 z-index: 100;
             }
-            .header-container {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 0 1rem;
+            .topbar .logo {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                height: 72px;
-            }
-            .logo {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
+                gap: 12px;
+                font-size: 1.3rem;
                 font-weight: 700;
-                font-size: 1.5rem;
-                color: var(--primary);
-                text-decoration: none;
                 letter-spacing: 1px;
             }
-            .logo-icon img {
+            .topbar .logo-icon {
                 width: 48px;
                 height: 48px;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+                border-radius: 8px;
+                overflow: hidden;
             }
-            .nav {
+            .logo-icon .logo-img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+            .topbar .nav {
                 display: flex;
+                gap: 24px;
                 align-items: center;
-                gap: 1.5rem;
+                padding: 0.5rem 4rem 0.5rem 2rem;
             }
-            .nav-link {
-                color: var(--secondary);
+
+            .topbar .nav a {
+                color: #fff;
                 text-decoration: none;
                 font-weight: 500;
-                padding: 0.5rem 1rem;
+                font-size: 1rem;
+                padding: 8px 14px;
                 border-radius: 8px;
-                transition: all 0.2s;
+                transition: background 0.2s;
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
-                font-size: 0.95rem;
+                gap: 8px;
             }
-            .nav-link:hover, .nav-link.active {
-                color: var(--primary);
-                background: #f1f5f9;
+            .topbar .nav a.active,
+            .topbar .nav a:hover {
+                background: rgba(255, 255, 255, 0.13);
             }
-            .user-menu {
-                position: relative;
-            }
-            .user-btn {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.5rem 1rem;
+            .topbar .account-btn {
+                background: none;
                 border: none;
-                background: #f1f5f9;
-                border-radius: 999px;
-                cursor: pointer;
-                transition: all 0.2s;
+                color: #fff;
+                font-size: 1rem;
                 font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                padding: 8px 14px;
+                border-radius: 8px;
+                transition: background 0.2s;
             }
-            .user-btn:hover {
-                background: #e0e7ef;
+            .topbar .account-btn:hover {
+                background: rgba(255, 255, 255, 0.13);
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             .avatar img {
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                border: 2px solid #e5e7eb;
+                width: 100%;
+                height: 100%;
                 object-fit: cover;
             }
             .dropdown {
@@ -174,81 +182,95 @@
             }
             .content-wrapper {
                 display: flex;
-                max-width: 1400px;
+                max-width: 1600px;
                 width: 100%;
-                gap: 1.5rem;
+                gap: 2rem;
             }
             .sidebar-left, .sidebar-right {
-                width: 280px;
-                min-width: 220px;
+                width: 320px;
+                min-width: 280px;
                 background: var(--card-bg);
                 border-radius: var(--radius);
                 box-shadow: var(--shadow);
-                padding: 1.5rem;
+                padding: 2rem;
                 height: fit-content;
                 position: sticky;
-                top: 90px;
+                top: 70px;
                 z-index: 99;
-            }
-            .sidebar-right {
-                margin-right: 0;
             }
             .main-content {
                 flex: 1;
-                max-width: 800px;
+                max-width: 900px;
+                min-width: 600px;
                 display: flex;
                 flex-direction: column;
                 gap: 1.5rem;
             }
             .widget {
                 background: var(--card-bg);
-                border-radius: 12px;
-                padding: 1rem;
+                border-radius: 16px;
+                padding: 0 1rem 0 1rem;
             }
             .widget-title {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
                 color: var(--primary);
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.75rem;
                 font-weight: 700;
+                padding-bottom: 0.75rem;
+                border-bottom: 2px solid #f1f5f9;
             }
             .user-card {
                 text-align: center;
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                border-radius: 16px;
+                padding: 2rem 1.5rem;
+                border: 1px solid #e2e8f0;
             }
             .user-card .avatar img {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 0.5rem;
+                width: 90px;
+                height: 90px;
+                margin-bottom: 1rem;
+                border: 4px solid #fff;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.1);
             }
             .user-card .username {
-                font-size: 1.15rem;
+                font-size: 1.25rem;
                 font-weight: 700;
                 color: #222b45;
+                margin-bottom: 0.5rem;
             }
             .user-card .role {
                 color: var(--secondary);
-                font-size: 0.95rem;
-                margin-bottom: 0.5rem;
+                font-size: 1rem;
+                margin-bottom: 1rem;
+                padding: 0.25rem 0.75rem;
+                background: rgba(79, 140, 255, 0.1);
+                border-radius: 20px;
+                display: inline-block;
             }
             .user-stats {
                 display: flex;
                 justify-content: space-around;
-                margin-top: 1rem;
-                padding-top: 1rem;
-                border-top: 1px solid #f1f5f9;
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
+                border-top: 2px solid #f1f5f9;
             }
             .stat-item {
                 text-align: center;
             }
             .stat-item .value {
                 font-weight: 700;
-                color: #222b45;
+                color: var(--primary);
+                font-size: 1.5rem;
+                display: block;
             }
             .stat-item .label {
                 color: var(--secondary);
-                font-size: 0.85rem;
+                font-size: 0.9rem;
+                margin-top: 0.25rem;
             }
             .breadcrumb {
                 display: flex;
@@ -389,7 +411,7 @@
                 color: var(--primary);
             }
             .actions-menu .delete-btn {
-                color: var(--danger);
+                color: #dc2626;
             }
             .actions-menu .delete-btn:hover {
                 background: #fee2e2;
@@ -446,51 +468,30 @@
             .stats-row {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                gap: 1.5rem;
-            }
-            .stats-info {
-                display: flex;
-                align-items: center;
-                gap: 1.5rem;
-                color: var(--secondary);
-                font-size: 0.95rem;
-                font-weight: 500;
-            }
-            .stat-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .interaction-buttons {
-                display: flex;
-                gap: 0.75rem;
+                gap: 1rem;
+                justify-content: flex-start;
             }
             .interaction-btn {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
                 padding: 0.5rem 1.2rem;
-                border: 1.5px solid #e5e7eb;
-                background: #fff;
+                border: none;
+                background: transparent;
                 color: var(--secondary);
-                border-radius: 999px;
+                border-radius: 8px;
                 cursor: pointer;
                 transition: all 0.2s;
                 font-size: 0.95rem;
                 font-weight: 600;
-                box-shadow: 0 2px 8px 0 rgba(59,130,246,0.03);
             }
             .interaction-btn:hover {
                 background: #f1f5f9;
                 color: var(--primary);
-                border-color: var(--primary);
             }
             .interaction-btn.liked {
-                background: var(--primary);
-                color: #fff;
-                border-color: var(--primary);
-                box-shadow: 0 4px 16px 0 rgba(59,130,246,0.08);
+                color: var(--primary);
+                font-weight: 700;
             }
             .comments-section {
                 background: #fff;
@@ -649,52 +650,62 @@
             }
             .related-posts {
                 background: var(--card-bg);
-                border-radius: var(--radius);
+                border-radius: 16px;
                 box-shadow: var(--shadow);
                 overflow: hidden;
-                margin-top: 1.5rem;
                 border: none;
             }
             .related-header {
-                padding: 1rem 2rem;
-                border-bottom: 1px solid #f1f5f9;
-                background: #f9fafb;
+                padding: 1.5rem 2rem;
+                border-bottom: 2px solid #f1f5f9;
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             }
             .related-title {
                 font-size: 1.2rem;
                 font-weight: 700;
-                color: #222b45;
+                color: var(--primary);
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.75rem;
+                margin: 0;
             }
             .related-list {
                 padding: 0;
             }
             .related-item {
                 display: flex;
-                gap: 1rem;
-                padding: 1rem 2rem;
+                gap: 1.25rem;
+                padding: 1.5rem 2rem;
                 border-bottom: 1px solid #f1f5f9;
-                transition: all 0.2s;
+                transition: all 0.3s;
                 text-decoration: none;
                 color: inherit;
-                align-items: center;
+                align-items: flex-start;
                 background: #fff;
             }
             .related-item:hover {
-                background: #f1f5f9;
-                box-shadow: 0 2px 8px 0 rgba(59,130,246,0.06);
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                box-shadow: 0 4px 16px 0 rgba(59,130,246,0.08);
+                transform: translateY(-2px);
             }
             .related-item:last-child {
                 border-bottom: none;
             }
+            .related-image {
+                flex-shrink: 0;
+            }
             .related-image img {
-                width: 80px;
-                height: 60px;
-                border-radius: 8px;
+                width: 100px;
+                height: 75px;
+                border-radius: 12px;
                 object-fit: cover;
                 background: #f1f5f9;
+                border: 2px solid #e2e8f0;
+                transition: all 0.3s;
+            }
+            .related-item:hover .related-image img {
+                border-color: var(--primary);
+                box-shadow: 0 4px 12px rgba(79, 140, 255, 0.2);
             }
             .related-content {
                 flex: 1;
@@ -703,20 +714,30 @@
             .related-post-title {
                 font-weight: 700;
                 color: #222b45;
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.75rem;
                 line-height: 1.4;
-                font-size: 1rem;
+                font-size: 1.05rem;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
+                transition: color 0.3s;
+            }
+            .related-item:hover .related-post-title {
+                color: var(--primary);
             }
             .related-meta {
                 color: #94a3b8;
                 font-size: 0.9rem;
                 display: flex;
+                flex-wrap: wrap;
                 gap: 1rem;
                 font-weight: 500;
+            }
+            .related-meta span {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
             }
             .modal-overlay {
                 position: fixed;
@@ -803,6 +824,19 @@
                 margin-bottom: 0.5rem;
                 color: var(--secondary);
             }
+            @media (max-width: 1400px) {
+                .content-wrapper {
+                    max-width: 1200px;
+                }
+                .sidebar-left, .sidebar-right {
+                    width: 280px;
+                    min-width: 250px;
+                }
+                .main-content {
+                    max-width: 800px;
+                    min-width: 500px;
+                }
+            }
             @media (max-width: 1200px) {
                 .content-wrapper {
                     flex-direction: column;
@@ -816,6 +850,8 @@
                 }
                 .main-content {
                     width: 100%;
+                    max-width: 800px;
+                    min-width: auto;
                 }
             }
             @media (max-width: 768px) {
@@ -834,75 +870,43 @@
                     height: 36px;
                 }
                 .related-image img {
-                    width: 60px;
-                    height: 45px;
+                    width: 80px;
+                    height: 60px;
+                }
+                .related-item {
+                    gap: 1rem;
+                    padding: 1rem;
+                }
+                .sidebar-left, .sidebar-right {
+                    padding: 1.5rem;
                 }
             }
         </style>
     </head>
     <body>
-        <!-- Header -->
-        <header class="header">
-            <div class="header-container">
-                <a href="<%= request.getContextPath()%>/" class="logo">
-                    <div class="logo-icon">
-                        <img src="<%= request.getContextPath()%>/assets/img/logo.png" alt="Logo" />
-                    </div>
-                    <span>JLPT Forum</span>
-                </a>
-                <nav class="nav">
-                    <a href="<%= request.getContextPath()%>/" class="nav-link">
-                        <i class="fas fa-home"></i>
-                        <span>Trang chủ</span>
-                    </a>
-                    <a href="<%= request.getContextPath()%>/forum" class="nav-link">
-                        <i class="fas fa-comments"></i>
-                        <span>Diễn đàn</span>
-                    </a>
-                    <a href="<%= request.getContextPath()%>/contact" class="nav-link">
-                        <i class="fas fa-envelope"></i>
-                        <span>Liên hệ</span>
-                    </a>
-                    <div class="user-menu">
-                        <button class="user-btn" onclick="toggleUserMenu()">
-                            <div class="avatar">
-                                <img src="<%= request.getContextPath()%>/<%= request.getAttribute("user") != null && ((User) request.getAttribute("user")).getProfilePicture() != null && !((User) request.getAttribute("user")).getProfilePicture().isEmpty() ? ((User) request.getAttribute("user")).getProfilePicture() : "assets/img/avatar.png"%>" alt="Avatar" />
-                            </div>
-                            <span><%= escapeHtml((String) request.getAttribute("username"))%></span>
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div class="dropdown" id="userDropdown">
-                            <%
-                                String username = (String) request.getAttribute("username");
-                                if ("Guest".equals(username)) {
-                            %>
-                            <a href="<%= request.getContextPath()%>/login" class="dropdown-item">
-                                <i class="fas fa-sign-in-alt"></i>
-                                Đăng nhập
-                            </a>
-                            <%
-                            } else {
-                            %>
-                            <a href="<%= request.getContextPath()%>/profile" class="dropdown-item">
-                                <i class="fas fa-user"></i>
-                                Hồ sơ cá nhân
-                            </a>
-                            <a href="<%= request.getContextPath()%>/settings" class="dropdown-item">
-                                <i class="fas fa-cog"></i>
-                                Cài đặt
-                            </a>
-                            <a href="<%= request.getContextPath()%>/logout" class="dropdown-item">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Đăng xuất
-                            </a>
-                            <%
-                                }
-                            %>
-                        </div>
-                    </div>
-                </nav>
+        <div class="topbar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="<%= request.getContextPath()%>/assets/img/logo.png" alt="Logo" class="logo-img" />
+                </div>
+                Diễn Đàn HIKARI
             </div>
-        </header>
+            <nav class="nav">
+                <a href="<%= request.getContextPath()%>/"><i class="fas fa-home"></i> Trang Chủ</a>
+                <a href="<%= request.getContextPath()%>/contact"><i class="fas fa-phone"></i> Liên Hệ</a>
+                <a href="<%= request.getContextPath()%>/profile?user=" + userID() class="nav-link ">
+                    <i class="fas fa-user"></i>
+                    <span>Hồ sơ</span>
+                </a>
+                <div class="account-dropdown" id="accountDropdown">
+                    <button class="account-btn">
+                        <div class="avatar sm">
+                            <img src="<%= request.getContextPath()%>/assets/img/avatar.png" alt="Avatar" />
+                        </div>
+                    </button> 
+                </div>
+            </nav>
+        </div>
 
         <!-- Main Container -->
         <div class="container">
@@ -911,7 +915,6 @@
                 <%
                     ForumPost post = (ForumPost) request.getAttribute("postDetail");
                     User author = post != null ? new UserDAO().getUserById(post.getPostedBy()) : null;
-                    // Lấy tổng bình luận và lượt thích của tác giả từ UserActivityScore (theo userID)
                     UserActivityScore authorScore = null;
                     List<UserActivityScore> allScores = (List<UserActivityScore>) request.getAttribute("topUsers");
                     if (author != null && allScores != null) {
@@ -926,8 +929,8 @@
                 <aside class="sidebar-left">
                     <div class="widget user-card">
                         <div class="widget-title">
-                            <i class="fas fa-user"></i>
-                            Tác giả
+                            <i class="fas fa-user-circle"></i>
+                            Thông tin tác giả
                         </div>
                         <% if (author != null) {%>
                         <div class="avatar">
@@ -939,17 +942,17 @@
                         <div class="role">
                             <%= escapeHtml(author.getRole() != null ? author.getRole() : "Thành viên")%>
                             <% if (author.getRole() != null && author.getRole().toLowerCase().contains("admin")) { %>
-                            <span style="display:inline-block;margin-top:0.3rem;padding:0.2rem 0.8rem;font-size:0.85rem;background:linear-gradient(90deg,#a18cd1 0%,#fbc2eb 100%);color:#5a189a;border-radius:8px;font-weight:600;">Admin</span>
+                            <span style="display:block;margin-top:0.5rem;padding:0.3rem 1rem;font-size:0.85rem;background:linear-gradient(90deg,#a18cd1 0%,#fbc2eb 100%);color:#5a189a;border-radius:12px;font-weight:600;">Admin</span>
                             <% }%>
                         </div>
                         <div class="user-stats">
                             <div class="stat-item">
-                                <div class="value"><%= authorScore != null ? authorScore.getTotalComments() : 0%></div>
-                                <div class="label">Bình luận</div>
+                                <span class="value"><%= authorScore != null ? authorScore.getTotalComments() : 0%></span>
+                                <span class="label">Bình luận</span>
                             </div>
                             <div class="stat-item">
-                                <div class="value"><%= authorScore != null ? authorScore.getTotalVotes() : 0%></div>
-                                <div class="label">Lượt thích</div>
+                                <span class="value"><%= authorScore != null ? authorScore.getTotalVotes() : 0%></span>
+                                <span class="label">Lượt thích</span>
                             </div>
                         </div>
                         <% } else { %>
@@ -961,18 +964,19 @@
                         </div>
                         <% } %>
                     </div>
-                    <!-- Related Posts moved here -->
-                    <section class="related-posts" style="margin-top:2rem;">
+
+                    <!-- Related Posts -->
+                    <section class="related-posts">
                         <div class="related-header">
                             <h2 class="related-title">
-                                <i class="fas fa-link"></i>
+                                <i class="fas fa-newspaper"></i>
                                 Bài viết liên quan
                             </h2>
                         </div>
                         <div class="related-list">
                             <%
                                 List<ForumPost> relatedPosts = (List<ForumPost>) request.getAttribute("relatedPosts");
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                                 if (relatedPosts != null && !relatedPosts.isEmpty()) {
                                     for (ForumPost relatedPost : relatedPosts) {
                                         String relatedPicture = relatedPost.getPicture() != null ? relatedPost.getPicture() : "";
@@ -989,16 +993,16 @@
                                     </h3>
                                     <div class="related-meta">
                                         <span>
-                                            <i class="fas fa-clock"></i>
+                                            <i class="fas fa-calendar-alt"></i>
                                             <%= formattedRelatedDate%>
                                         </span>
                                         <span>
                                             <i class="fas fa-comment"></i>
-                                            <%= relatedPost.getCommentCount()%> bình luận
+                                            <%= relatedPost.getCommentCount()%>
                                         </span>
                                         <span>
                                             <i class="fas fa-eye"></i>
-                                            <%= relatedPost.getViewCount()%> lượt xem
+                                            <%= relatedPost.getViewCount()%>
                                         </span>
                                     </div>
                                 </div>
@@ -1009,7 +1013,7 @@
                             %>
                             <div class="empty-state">
                                 <div class="empty-icon">
-                                    <i class="fas fa-link"></i>
+                                    <i class="fas fa-newspaper"></i>
                                 </div>
                                 <h3 class="empty-title">Không có bài viết liên quan</h3>
                                 <p>Hiện tại chưa có bài viết nào cùng danh mục.</p>
@@ -1083,6 +1087,10 @@
                                         <p>
                                             <i class="fas fa-clock"></i>
                                             <%= formattedDate%>
+                                            <span style="margin-left: 1rem;">
+                                                <i class="fas fa-eye"></i>
+                                                <%= post.getViewCount()%> lượt xem
+                                            </span>
                                         </p>
                                     </div>
                                 </div>
@@ -1111,45 +1119,29 @@
                             </div>
                         </header>
                         <div class="post-content">
+                            <div class="post-text">
+                                <%= escapeHtml(post.getContent()).replace("\n", "<br>")%>
+                            </div>
                             <% if (postPicture != null && !postPicture.isEmpty()) {%>
                             <div class="post-image">
                                 <img src="<%= request.getContextPath()%>/<%= escapeHtml(postPicture)%>" alt="Post image" />
                             </div>
                             <% }%>
-                            <div class="post-text">
-                                <%= escapeHtml(post.getContent()).replace("\n", "<br>")%>
-                            </div>
                         </div>
                         <div class="post-stats">
                             <div class="stats-row">
-                                <div class="stats-info">
-                                    <div class="stat-item">
-                                        <i class="fas fa-thumbs-up"></i>
-                                        <span><%= post.getVoteCount()%> lượt thích</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <i class="fas fa-comment"></i>
-                                        <span><%= post.getCommentCount()%> bình luận</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <i class="fas fa-eye"></i>
-                                        <span><%= post.getViewCount()%> lượt xem</span>
-                                    </div>
-                                </div>
-                                <div class="interaction-buttons">
-                                    <button class="interaction-btn <%= hasLiked ? "liked" : ""%>" onclick="toggleLike(<%= post.getId()%>, this)">
-                                        <i class="fas fa-thumbs-up"></i>
-                                        <span class="like-count"><%= post.getVoteCount()%></span>
-                                    </button>
-                                    <button class="interaction-btn" onclick="focusCommentForm()">
-                                        <i class="fas fa-comment"></i>
-                                        Bình luận
-                                    </button>
-                                    <button class="interaction-btn" onclick="sharePost()">
-                                        <i class="fas fa-share"></i>
-                                        Chia sẻ
-                                    </button>
-                                </div>
+                                <button class="interaction-btn <%= hasLiked ? "liked" : ""%>" onclick="toggleLike(<%= post.getId()%>, this)">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span class="like-count"><%= post.getVoteCount()%> Thích</span>
+                                </button>
+                                <button class="interaction-btn" onclick="focusCommentForm()">
+                                    <i class="fas fa-comment"></i>
+                                    <span><%= post.getCommentCount()%> Bình luận</span>
+                                </button>
+                                <button class="interaction-btn" onclick="sharePost()">
+                                    <i class="fas fa-share"></i>
+                                    Chia sẻ
+                                </button>
                             </div>
                         </div>
                         <section class="comments-section">
@@ -1223,7 +1215,7 @@
                             </form>
                         </section>
                     </article>
-                    
+
                     <% }%>
                 </div>
 
@@ -1255,9 +1247,20 @@
                             Leaderboard
                         </div>
                         <div style="display:flex;gap:8px;margin-bottom:18px;">
-                            <button style="flex:1;padding:7px 0;border:none;border-radius:8px;<%= "weekly".equals(request.getAttribute("timeFrame")) ? "background:#f4f6fb;color:#232946;" : "background:transparent;color:#888;"%>font-weight:600;cursor:pointer;" onclick="window.location.href = '<%= request.getContextPath()%>/forum?sort=weekly&filter=<%= escapeHtml((String) request.getAttribute("filter"))%>&search=<%= escapeHtml(request.getParameter("search") != null ? request.getParameter("search") : "")%>'">This Week</button>
-                            <button style="flex:1;padding:7px 0;border:none;border-radius:8px;<%= "monthly".equals(request.getAttribute("timeFrame")) ? "background:#f4f6fb;color:#232946;" : "background:transparent;color:#888;"%>font-weight:600;cursor:pointer;" onclick="window.location.href = '<%= request.getContextPath()%>/forum?sort=monthly&filter=<%= escapeHtml((String) request.getAttribute("filter"))%>&search=<%= escapeHtml(request.getParameter("search") != null ? request.getParameter("search") : "")%>'">This Month</button>
-                            <button style="flex:1;padding:7px 0;border:none;border-radius:8px;<%= "alltime".equals(request.getAttribute("timeFrame")) ? "background:#f4f6fb;color:#232946;" : "background:transparent;color:#888;"%>font-weight:600;cursor:pointer;" onclick="window.location.href = '<%= request.getContextPath()%>/forum?sort=alltime&filter=<%= escapeHtml((String) request.getAttribute("filter"))%>&search=<%= escapeHtml(request.getParameter("search") != null ? request.getParameter("search") : "")%>'">All Time</button>
+                            <%
+                                String currentPostId = post != null ? String.valueOf(post.getId()) : "";
+                                String currentTimeFrame = (String) request.getAttribute("timeFrame");
+                                String currentFilter = (String) request.getAttribute("filter");
+                                String currentSearch = (String) request.getAttribute("search");
+                                if (currentFilter == null) {
+                                    currentFilter = "all";
+                                }
+                                if (currentSearch == null)
+                                    currentSearch = "";
+                            %>
+                            <button style="flex:1;padding:7px 0;border:none;border-radius:8px;<%= "weekly".equals(currentTimeFrame) ? "background:#f4f6fb;color:#232946;" : "background:transparent;color:#888;"%>font-weight:600;cursor:pointer;" onclick="window.location.href = '<%= request.getContextPath()%>/forum/post/<%= currentPostId%>?sort=weekly&filter=<%= escapeHtml(currentFilter)%>&search=<%= escapeHtml(currentSearch)%>'">This Week</button>
+                            <button style="flex:1;padding:7px 0;border:none;border-radius:8px;<%= "monthly".equals(currentTimeFrame) ? "background:#f4f6fb;color:#232946;" : "background:transparent;color:#888;"%>font-weight:600;cursor:pointer;" onclick="window.location.href = '<%= request.getContextPath()%>/forum/post/<%= currentPostId%>?sort=monthly&filter=<%= escapeHtml(currentFilter)%>&search=<%= escapeHtml(currentSearch)%>'">This Month</button>
+                            <button style="flex:1;padding:7px 0;border:none;border-radius:8px;<%= "alltime".equals(currentTimeFrame) ? "background:#f4f6fb;color:#232946;" : "background:transparent;color:#888;"%>font-weight:600;cursor:pointer;" onclick="window.location.href = '<%= request.getContextPath()%>/forum/post/<%= currentPostId%>?sort=alltime&filter=<%= escapeHtml(currentFilter)%>&search=<%= escapeHtml(currentSearch)%>'">All Time</button>
                         </div>
                         <div style="display:flex;align-items:flex-end;justify-content:center;gap:18px;margin-bottom:18px;">
                             <%
@@ -1335,7 +1338,7 @@
             <div class="modal">
                 <div class="modal-header">
                     <h3 class="modal-title">
-                        <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                        <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
                         Xác nhận xóa
                     </h3>
                     <p class="modal-text">Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể hoàn tác.</p>
@@ -1384,8 +1387,7 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                document.querySelector('.stat-item:first-child span').textContent = `${data.voteCount} lượt thích`;
-                                button.querySelector(".like-count").textContent = data.voteCount;
+                                button.querySelector(".like-count").textContent = `${data.voteCount} Thích`;
                                 button.classList.toggle("liked");
                             } else {
                                 alert(data.message || "Có lỗi xảy ra!");
