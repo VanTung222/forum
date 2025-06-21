@@ -1,6 +1,6 @@
 package model;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class Achievement {
     private int id;
@@ -9,20 +9,21 @@ public class Achievement {
     private String title;
     private String description;
     private Date achievedDate;
-    private int relatedID;
+    private int relatedId;
     private boolean isActive;
 
     // Constructors
     public Achievement() {}
 
-    public Achievement(String userId, String achievementType, String title, 
-                      String description, Date achievedDate, int relatedID, boolean isActive) {
+    public Achievement(int id, String userId, String achievementType, String title, 
+                      String description, Date achievedDate, int relatedId, boolean isActive) {
+        this.id = id;
         this.userId = userId;
         this.achievementType = achievementType;
         this.title = title;
         this.description = description;
         this.achievedDate = achievedDate;
-        this.relatedID = relatedID;
+        this.relatedId = relatedId;
         this.isActive = isActive;
     }
 
@@ -45,8 +46,8 @@ public class Achievement {
     public Date getAchievedDate() { return achievedDate; }
     public void setAchievedDate(Date achievedDate) { this.achievedDate = achievedDate; }
 
-    public int getRelatedID() { return relatedID; }
-    public void setRelatedID(int relatedID) { this.relatedID = relatedID; }
+    public int getRelatedId() { return relatedId; }
+    public void setRelatedId(int relatedId) { this.relatedId = relatedId; }
 
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }

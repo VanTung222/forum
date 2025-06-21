@@ -59,7 +59,10 @@
             List<ForumPost> userPosts = (List<ForumPost>) request.getAttribute("userPosts");
             List<Achievement> achievements = (List<Achievement>) request.getAttribute("achievements");
             UserActivityScore activityScore = (UserActivityScore) request.getAttribute("activityScore");
+            Boolean isOwnProfile = (Boolean) request.getAttribute("isOwnProfile");
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            
+            if (isOwnProfile == null) isOwnProfile = true;
         %>
 
         <!-- Profile Header -->
@@ -78,6 +81,16 @@
                             <i class="fas fa-<%= user.getRole().equals("Student") ? "graduation-cap" : user.getRole().equals("Teacher") ? "chalkboard-teacher" : "user-shield" %>"></i>
                             <%= escapeHtml(user.getRole()) %>
                         </div>
+                        <% if (!isOwnProfile) { %>
+                        <div class="profile-actions" style="margin-top: 1rem;">
+                            <button class="btn btn-primary" onclick="sendMessage('<%= escapeHtml(user.getUserId()) %>')">
+                                <i class="fas fa-envelope"></i> Nhắn tin
+                            </button>
+                            <button class="btn btn-secondary" onclick="followUser('<%= escapeHtml(user.getUserId()) %>')">
+                                <i class="fas fa-user-plus"></i> Theo dõi
+                            </button>
+                        </div>
+                        <% } %>
                         <div class="profile-stats">
                             <div class="stat-item">
                                 <div class="value"><%= enrolledCourses != null ? enrolledCourses.size() : 0 %></div>
@@ -104,6 +117,7 @@
         <!-- Sidebar Left -->
         <aside class="sidebar-left">
             <!-- Quick Actions -->
+            <% if (isOwnProfile) { %>
             <div class="widget fade-in">
                 <div class="widget-header">
                     <h3 class="widget-title">
@@ -124,17 +138,19 @@
                     </div>
                 </div>
             </div>
+            <% } %>
 
             <!-- Personal Info -->
             <div class="widget fade-in">
                 <div class="widget-header">
                     <h3 class="widget-title">
                         <i class="fas fa-info-circle"></i>
-                        Thông tin cá nhân
+                        Thông tin <%= isOwnProfile ? "cá nhân" : "người dùng" %>
                     </h3>
                 </div>
                 <div class="widget-content">
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <% if (isOwnProfile) { %>
                         <div>
                             <strong>Email:</strong><br>
                             <span style="color: var(--text-secondary);"><%= escapeHtml(user.getEmail()) %></span>
@@ -146,6 +162,15 @@
                         <div>
                             <strong>Ngày sinh:</strong><br>
                             <span style="color: var(--text-secondary);"><%= user.getBirthDate() != null ? sdf.format(user.getBirthDate()) : "Chưa cập nhật" %></span>
+                        </div>
+                        <% } %>
+                        <div>
+                            <strong>Tên người dùng:</strong><br>
+                            <span style="color: var(--text-secondary);"><%= escapeHtml(user.getUsername()) %></span>
+                        </div>
+                        <div>
+                            <strong>Vai trò:</strong><br>
+                            <span style="color: var(--text-secondary);"><%= escapeHtml(user.getRole()) %></span>
                         </div>
                         <div>
                             <strong>Ngày đăng ký:</strong><br>
@@ -163,7 +188,7 @@
                 <div class="widget-header">
                     <h3 class="widget-title">
                         <i class="fas fa-book-open"></i>
-                        Tiến độ khóa học
+                        <%= isOwnProfile ? "Tiến độ khóa học" : "Khóa học đã tham gia" %>
                     </h3>
                 </div>
                 <div class="widget-content">
@@ -179,10 +204,14 @@
                         </div>
                         <div class="course-info">
                             <div class="course-title"><%= escapeHtml(course.getTitle()) %></div>
+                            <% if (isOwnProfile) { %>
                             <div class="course-progress"><%= progress %>% hoàn thành</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: <%= progress %>%;"></div>
                             </div>
+                            <% } else { %>
+                            <div class="course-progress">Đã tham gia</div>
+                            <% } %>
                         </div>
                     </div>
                     <%
@@ -191,8 +220,10 @@
                     %>
                     <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
                         <i class="fas fa-book" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Bạn chưa đăng ký khóa học nào</p>
+                        <p><%= isOwnProfile ? "Bạn chưa đăng ký khóa học nào" : "Người dùng chưa tham gia khóa học nào" %></p>
+                        <% if (isOwnProfile) { %>
                         <a href="<%= request.getContextPath() %>/courses" style="color: var(--primary); text-decoration: none; font-weight: 600;">Khám phá khóa học →</a>
+                        <% } %>
                     </div>
                     <%
                         }
@@ -229,8 +260,10 @@
                     %>
                     <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
                         <i class="fas fa-edit" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <p>Bạn chưa có bài viết nào</p>
+                        <p><%= isOwnProfile ? "Bạn chưa có bài viết nào" : "Người dùng chưa có bài viết nào" %></p>
+                        <% if (isOwnProfile) { %>
                         <a href="<%= request.getContextPath() %>/forum" style="color: var(--primary); text-decoration: none; font-weight: 600;">Viết bài đầu tiên →</a>
+                        <% } %>
                     </div>
                     <%
                         }
@@ -360,6 +393,15 @@
                 }
             });
         });
+
+        // Functions for profile actions (when viewing other user's profile)
+        function sendMessage(userId) {
+            alert('Tính năng nhắn tin sẽ được phát triển trong tương lai!');
+        }
+
+        function followUser(userId) {
+            alert('Tính năng theo dõi sẽ được phát triển trong tương lai!');
+        }
     </script>
 </body>
 </html>

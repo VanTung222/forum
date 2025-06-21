@@ -1,11 +1,10 @@
 package model;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 public class Course {
-    private int courseNum;
-    private String courseID;
+    private String courseId;
     private String title;
     private String description;
     private BigDecimal fee;
@@ -17,9 +16,9 @@ public class Course {
     // Constructors
     public Course() {}
 
-    public Course(String courseID, String title, String description, BigDecimal fee, 
-                 int duration, Date startDate, Date endDate, boolean isActive) {
-        this.courseID = courseID;
+    public Course(String courseId, String title, String description, BigDecimal fee, 
+                  int duration, Date startDate, Date endDate, boolean isActive) {
+        this.courseId = courseId;
         this.title = title;
         this.description = description;
         this.fee = fee;
@@ -30,11 +29,8 @@ public class Course {
     }
 
     // Getters and Setters
-    public int getCourseNum() { return courseNum; }
-    public void setCourseNum(int courseNum) { this.courseNum = courseNum; }
-
-    public String getCourseID() { return courseID; }
-    public void setCourseID(String courseID) { this.courseID = courseID; }
+    public String getCourseId() { return courseId; }
+    public void setCourseId(String courseId) { this.courseId = courseId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

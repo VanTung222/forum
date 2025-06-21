@@ -3,6 +3,7 @@ package controller;
 import dao.ForumPostDAO;
 import dao.UserActivityScoreDAO;
 import dao.UserDAO;
+import dao.PostViewDAO;
 import model.ForumPost;
 import model.UserActivityScore;
 import model.User;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @WebServlet(name = "ForumServlet", urlPatterns = {"/forum", "/forum/createPost", "/forum/post/*", "/forum/deletePost"})
@@ -29,6 +31,7 @@ public class ForumServlet extends HttpServlet {
     private ForumPostDAO postDAO;
     private UserActivityScoreDAO scoreDAO;
     private UserDAO userDAO;
+    private PostViewDAO postViewDAO;
 
     private static final List<String> VALID_SORTS = Arrays.asList("newest", "popular", "most-liked");
     private static final List<String> VALID_FILTERS = Arrays.asList("all", "with-replies", "no-replies");
@@ -38,6 +41,7 @@ public class ForumServlet extends HttpServlet {
         postDAO = new ForumPostDAO();
         scoreDAO = new UserActivityScoreDAO();
         userDAO = new UserDAO();
+        postViewDAO = new PostViewDAO();
         LOGGER.info("ForumServlet initialized");
     }
 
@@ -51,11 +55,11 @@ public class ForumServlet extends HttpServlet {
             String userId = (String) request.getSession().getAttribute("userId");
             User user = null;
             if (username == null || userId == null) {
-                username = "quy123"; // Default username
-                userId = "U001"; // Default userID
+                username = "hung123"; // Default username
+                userId = "U003"; // Default userID
                 request.getSession().setAttribute("username", username);
                 request.getSession().setAttribute("userId", userId);
-                LOGGER.info("No user in session, defaulting to U001/quy123");
+                LOGGER.info("No user in session, defaulting to U003/hung123");
             }
             user = userDAO.getUserByUsername(username);
             request.setAttribute("username", username);
@@ -72,12 +76,22 @@ public class ForumServlet extends HttpServlet {
             LOGGER.info("Leaderboard set with timeFrame: " + timeFrame + ", topUsers size: " + (topUsers != null ? topUsers.size() : 0));
 
             if (pathInfo != null && pathInfo.matches("/\\d+")) {
+                // Viewing a specific post
                 int postId = Integer.parseInt(pathInfo.substring(1));
                 ForumPost post = postDAO.getPostById(postId);
                 if (post == null) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Bài viết không tồn tại");
                     return;
                 }
+                
+                // Mark post as viewed by current user
+                try {
+                    postViewDAO.markPostAsViewed(userId, postId);
+                    LOGGER.info("Marked post " + postId + " as viewed by user " + userId);
+                } catch (SQLException e) {
+                    LOGGER.warning("Could not mark post as viewed: " + e.getMessage());
+                }
+                
                 postDAO.incrementViewCount(postId);
                 request.setAttribute("postDetail", post);
 
@@ -119,7 +133,18 @@ public class ForumServlet extends HttpServlet {
 
                 List<ForumPost> posts = postDAO.getPostsSortedAndFiltered(sort, filter, search, page, size);
 
+                // Get viewed posts for current user
+                Set<Integer> viewedPostIds = null;
+                try {
+                    viewedPostIds = postViewDAO.getViewedPostIds(userId);
+                    LOGGER.info("Retrieved " + viewedPostIds.size() + " viewed posts for user " + userId);
+                } catch (SQLException e) {
+                    LOGGER.warning("Could not get viewed posts: " + e.getMessage());
+                    viewedPostIds = new java.util.HashSet<>();
+                }
+
                 request.setAttribute("posts", posts);
+                request.setAttribute("viewedPostIds", viewedPostIds);
                 request.setAttribute("sort", sort);
                 request.setAttribute("filter", filter);
                 request.setAttribute("page", page);
